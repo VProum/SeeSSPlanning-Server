@@ -67,4 +67,10 @@ router.get("/logout", (req, res, next) => {
   });
 });
 
+
+
+router.get("/", (req, res) => {
+  res.send("dudul");
+})
+
 module.exports = router;

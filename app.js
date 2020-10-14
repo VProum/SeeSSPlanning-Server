@@ -11,6 +11,12 @@ const mongoose = require("mongoose");
 const app = express();
 const cors = require("cors");
 
+// //Twitch authent
+// var passport       = require("passport");
+// var twitchStrategy = require("passport-twitch").Strategy;
+
+
+
 /**
  * Middlewares
  */
@@ -20,7 +26,12 @@ app.use(logger("dev")); // This logs HTTP reponses in the console.
 app.use(express.json()); // Access data sent as json @req.body
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+//Twitch authent
+// app.use(passport.initialize());
 app.use(express.static(path.join(__dirname, "public")));
+
+
 app.use(
   session({
     store: new MongoStore({ mongooseConnection: mongoose.connection }), // Persist session in database.
@@ -41,8 +52,23 @@ app.use(function (req, res, next) {
  */
 
 const authRouter = require("./routes/auth");
-
 app.use("/api/auth", authRouter);
+
+
+
+const indexRouter = require("./routes/index");
+app.use("/", indexRouter);
+
+
+
+
+
+
+
+
+
+
+
 
 // 404 Middleware
 app.use((req, res, next) => {
