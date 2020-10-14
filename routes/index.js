@@ -20,7 +20,7 @@ passport.use(TwitchStrategy);
 refresh.use(TwitchStrategy);
 
 router.get("/", function(req, res, next) {
-    res.json("index");
+    res.json("toto");
 });
 
 router.get("/toto", function(req, res, next) {
@@ -44,9 +44,28 @@ router.get("/test/twitch", passport.authenticate('twitch'), (req, res, next) => 
   
 });*/
 
-router.get("/auth/twitch/callback", passport.authenticate("twitch", { failureRedirect: "/" }), function(req, res) {
-    // Successful authentication, redirect home.
-    res.redirect("/");
+router.get("/auth/twitch/callback", async function(req, res, next) {
+    try {
+        console.log(req.query.code);
+        const apiResult = await axios.post(`https://id.twitch.tv/oauth2/token?client_id=${process.env.TWITCH_CLIENT_ID}&client_secret=${process.env.TWITCH_CLIENT_SECRET}&code=${req.query.code}&grant_type=authorization_code&redirect_uri=http://localhost:8080/auth/twitch/callback`)
+
+
+        req.session.twitchInfo = apiResult.data;
+
+        //mettre api result dans session
+        let headers = {
+            "Authorization": `Bearer ${apiResult.data.access_token}`,
+            "Client-Id": process.env.TWITCH_CLIENT_ID
+        }
+
+
+        const getUserID = await axios.get(`https://api.twitch.tv/helix/users`, { headers })
+
+        res.json(getUserID.data);
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
 });
 
 
