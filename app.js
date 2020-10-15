@@ -52,12 +52,7 @@ app.use(function(req, res, next) {
  */
 
 const authRouter = require("./routes/auth");
-app.use("/api/auth", authRouter);
-
-
-
-const indexRouter = require("./routes/index");
-app.use("/", indexRouter);
+app.use("/auth", authRouter);
 
 
 

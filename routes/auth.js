@@ -1,76 +1,68 @@
 const express = require("express");
 const router = express.Router();
-const bcrypt = require("bcrypt");
 const User = require("../models/User");
+const axios = require("axios");
 
-const salt = 10;
+router.get("/twitch/callback", async function(req, res, next) {
+    try {
+        console.log(req.query.code);
+        const apiResult = await axios.post(`https://id.twitch.tv/oauth2/token?client_id=${process.env.TWITCH_CLIENT_ID}&client_secret=${process.env.TWITCH_CLIENT_SECRET}&code=${req.query.code}&grant_type=authorization_code&redirect_uri=http://localhost:8080/auth/twitch/callback`)
 
-router.post("/signin", (req, res, next) => {
-  const { email, password } = req.body;
-  User.findOne({ email })
-    .then((userDocument) => {
-      if (!userDocument) {
-        return res.status(400).json({ message: "Invalid credentials" });
-      }
+        //equivaut a req.session.currentuser
+        //mettre api result dans session
+        //req.session.currentUser = {};
+        // req.session.currentuser.twitchToken = apiResult.data;
+        //req.session.currentuser.twitchToken.timestamp = Date.now();
+        console.log(apiResult.data);
 
-      const isValidPassword = bcrypt.compareSync(password, userDocument.password);
-      if (!isValidPassword) {
-        return res.status(400).json({ message: "Invalid credentials" });
-      }
-      
-      req.session.currentUser = userDocument._id;
-      res.redirect("/api/auth/isLoggedIn");
-    })
-    .catch(next);
+        let headers = {
+            "Authorization": `Bearer ${apiResult.data.access_token}`,
+            "Client-Id": process.env.TWITCH_CLIENT_ID
+        }
+
+        const getUserID = await axios.get(`https://api.twitch.tv/helix/users`, { headers })
+            // a ajouter dans notre DB ET dans notre session
+        req.session.currentUser = getUserID.data[0];
+
+        let { id, email, profile_image_url, display_name, broadcaster_type } = getUserID.data.data[0];
+
+        let createdUser = {
+            twitch_id: id,
+            email: email,
+            avatar: profile_image_url,
+            nickname: display_name,
+            isStreamer: broadcaster_type ? true : false
+        }
+
+        const dbResult = await User.create(createdUser)
+
+
+
+        res.status(200).json(dbResult);
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
 });
 
-router.post("/signup", (req, res, next) => {
-  const { email, password, firstName, lastName } = req.body;
-
-  User.findOne({ email })
-    .then((userDocument) => {
-      if (userDocument) {
-        return res.status(400).json({ message: "Email already taken" });
-      }
-
-      const hashedPassword = bcrypt.hashSync(password, salt);
-      const newUser = { email, lastName, firstName, password: hashedPassword };
-
-      User.create(newUser)
-        .then((newUserDocument) => {
-          /* Login on signup */
-          req.session.currentUser = newUserDocument._id;
-          res.redirect("/api/auth/isLoggedIn");
-        })
-        .catch(next);
-    })
-    .catch(next);
-});
 
 router.get("/isLoggedIn", (req, res, next) => {
-  if (!req.session.currentUser)
-    return res.status(401).json({ message: "Unauthorized" });
+    if (!req.session.currentUser)
+        return res.status(401).json({ message: "Unauthorized" });
 
-  const id = req.session.currentUser;
-  User.findById(id)
-    .select("-password")
-    .then((userDocument) => {
-      res.status(200).json(userDocument);
-    })
-    .catch(next);
+    const id = req.session.currentUser.id;
+    User.find({ twitch_id: { $eq: id } })
+        .then((userDocument) => {
+            res.status(200).json(userDocument);
+        })
+        .catch(next);
 });
 
 router.get("/logout", (req, res, next) => {
-  req.session.destroy(function (error) {
-    if (error) next(error);
-    else res.status(200).json({ message: "Succesfully disconnected." });
-  });
+    req.session.destroy(function(error) {
+        if (error) next(error);
+        else res.status(200).json({ message: "Succesfully disconnected." });
+    });
 });
-
-
-
-router.get("/", (req, res) => {
-  res.send("dudul");
-})
 
 module.exports = router;
