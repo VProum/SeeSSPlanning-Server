@@ -10,7 +10,7 @@ cloudinary.config({
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  folder: "folder-name", // The name of the folder in cloudinary
+  folder: "cssp", // The name of the folder in cloudinary
   allowedFormats: ["jpg", "png"],
 });
 
