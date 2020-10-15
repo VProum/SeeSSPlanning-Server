@@ -34,11 +34,17 @@ router.get("/twitch/callback", async function(req, res, next) {
             isStreamer: broadcaster_type ? true : false
         }
 
-        const dbResult = await User.create(createdUser)
+        const findMyUser = await User.find({twitch_id : {$eq : id}});
 
+        console.log("_o/ \o/ \o_", findMyUser, ":::://<<<<<>>>>>");
+        if (findMyUser.length === 0){
+            const dbResult = await User.create(createdUser);
+            res.status(200).json(dbResult);
+        
+        }
 
-
-        res.status(200).json(dbResult);
+        res.redirect(process.env.FRONTEND_URL);
+        
     } catch (error) {
         console.log(error);
         next(error);

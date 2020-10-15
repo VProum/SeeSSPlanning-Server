@@ -6,7 +6,7 @@ const userSchema = new Schema({
     email: { type: String },
     avatar: String,
     streamer_list: [{ type: Schema.Types.ObjectId, ref: "User" }],
-    twitch_id: String,
+    twitch_id: {type: String, required: true, unique:true},
 
     isStreamer: Boolean,
     moderator: [{ type: Schema.Types.ObjectId, ref: "User" }],
