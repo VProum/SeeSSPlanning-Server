@@ -7,11 +7,6 @@ router.get("/twitch/callback", async function(req, res, next) {
     try {
         const apiResult = await axios.post(`https://id.twitch.tv/oauth2/token?client_id=${process.env.TWITCH_CLIENT_ID}&client_secret=${process.env.TWITCH_CLIENT_SECRET}&code=${req.query.code}&grant_type=authorization_code&redirect_uri=http://localhost:8080/auth/twitch/callback`)
 
-        //equivaut a req.session.currentuser
-        //mettre api result dans session
-        req.session.currentuser.twitchToken = apiResult.data;
-        req.session.currentuser.twitchToken.timestamp = Date.now();
-        console.log(apiResult.data);
 
 
         let headers = {
@@ -23,6 +18,12 @@ router.get("/twitch/callback", async function(req, res, next) {
             // a ajouter dans notre DB ET dans notre session
         req.session.currentUser = getUserID.data.data[0];
         console.log(req.session);
+
+        //equivaut a req.session.currentuser
+        //mettre api result dans session
+        req.session.currentUser.twitchToken = apiResult.data;
+        req.session.currentUser.twitchToken.timestamp = Date.now();
+        //console.log(apiResult.data);
 
         let { id, email, profile_image_url, display_name, broadcaster_type } = getUserID.data.data[0];
 
@@ -64,18 +65,17 @@ router.get("/isLoggedIn", (req, res, next) => {
         .catch(next);
 });
 
-router.get("/logout", (req, res, next) => {
-    req.session.destroy(async function(error) {
-        if (error) next(error);
-        else {
+router.get("/logout", async(req, res, next) => {
+    if (req.session.currentUser) {
+        await axios.post(`https://id.twitch.tv/oauth2/revoke?client_id=${process.env.TWITCH_CLIENT_ID}&token=${req.session.currentUser.twitchToken.access_token}`);
 
-            const apiResult = await axios.post(`https://id.twitch.tv/oauth2/revoke?client_id=${process.env.TWITCH_CLIENT_ID}&token=${req.session.currentUser.twitchToken.access_token}`);
-
-            res.status(200).json({ message: "Succesfully disconnected." });
-        }
-    });
-
-
+        req.session.destroy(function(error) {
+            if (error) next(error);
+            else {
+                res.status(200).json({ message: "Succesfully disconnected." });
+            }
+        });
+    }
 });
 
 module.exports = router;
