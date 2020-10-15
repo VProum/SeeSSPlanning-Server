@@ -5,7 +5,6 @@ const axios = require("axios");
 
 router.get("/twitch/callback", async function(req, res, next) {
     try {
-        console.log(req.query.code);
         const apiResult = await axios.post(`https://id.twitch.tv/oauth2/token?client_id=${process.env.TWITCH_CLIENT_ID}&client_secret=${process.env.TWITCH_CLIENT_SECRET}&code=${req.query.code}&grant_type=authorization_code&redirect_uri=http://localhost:8080/auth/twitch/callback`)
 
         //equivaut a req.session.currentuser
@@ -13,7 +12,7 @@ router.get("/twitch/callback", async function(req, res, next) {
         //req.session.currentUser = {};
         // req.session.currentuser.twitchToken = apiResult.data;
         //req.session.currentuser.twitchToken.timestamp = Date.now();
-        console.log(apiResult.data);
+
 
         let headers = {
             "Authorization": `Bearer ${apiResult.data.access_token}`,
@@ -22,7 +21,8 @@ router.get("/twitch/callback", async function(req, res, next) {
 
         const getUserID = await axios.get(`https://api.twitch.tv/helix/users`, { headers })
             // a ajouter dans notre DB ET dans notre session
-        req.session.currentUser = getUserID.data[0];
+            console.log(">>>>>>>>>>>>>>>>><<", getUserID.data[0]);
+            req.session.currentUser = getUserID.data[0];
 
         let { id, email, profile_image_url, display_name, broadcaster_type } = getUserID.data.data[0];
 
@@ -36,7 +36,7 @@ router.get("/twitch/callback", async function(req, res, next) {
 
         const findMyUser = await User.find({twitch_id : {$eq : id}});
 
-        console.log("_o/ \o/ \o_", findMyUser, ":::://<<<<<>>>>>");
+       
         if (findMyUser.length === 0){
             const dbResult = await User.create(createdUser);
             res.status(200).json(dbResult);
@@ -53,6 +53,9 @@ router.get("/twitch/callback", async function(req, res, next) {
 
 
 router.get("/isLoggedIn", (req, res, next) => {
+
+    console.log("_o/ \o/ \o_", req.session, ":::://<<<<<>>>>>");
+
     if (!req.session.currentUser)
         return res.status(401).json({ message: "Unauthorized" });
 
@@ -62,7 +65,7 @@ router.get("/isLoggedIn", (req, res, next) => {
             res.status(200).json(userDocument);
         })
         .catch(next);
-});
+});     
 
 router.get("/logout", (req, res, next) => {
     req.session.destroy(function(error) {
