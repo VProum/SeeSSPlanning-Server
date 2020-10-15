@@ -10,10 +10,10 @@ router.get("/twitch/callback", async function(req, res, next) {
 
         //equivaut a req.session.currentuser
         //mettre api result dans session
-        //req.session.currentUser = {};
-        // req.session.currentuser.twitchToken = apiResult.data;
-        //req.session.currentuser.twitchToken.timestamp = Date.now();
+        req.session.currentuser.twitchToken = apiResult.data;
+        req.session.currentuser.twitchToken.timestamp = Date.now();
         console.log(apiResult.data);
+
 
         let headers = {
             "Authorization": `Bearer ${apiResult.data.access_token}`,
@@ -22,7 +22,8 @@ router.get("/twitch/callback", async function(req, res, next) {
 
         const getUserID = await axios.get(`https://api.twitch.tv/helix/users`, { headers })
             // a ajouter dans notre DB ET dans notre session
-        req.session.currentUser = getUserID.data[0];
+        req.session.currentUser = getUserID.data.data[0];
+        console.log(req.session);
 
         let { id, email, profile_image_url, display_name, broadcaster_type } = getUserID.data.data[0];
 
@@ -34,17 +35,17 @@ router.get("/twitch/callback", async function(req, res, next) {
             isStreamer: broadcaster_type ? true : false
         }
 
-        const findMyUser = await User.find({twitch_id : {$eq : id}});
+        const findMyUser = await User.find({ twitch_id: { $eq: id } });
 
         console.log("_o/ \o/ \o_", findMyUser, ":::://<<<<<>>>>>");
-        if (findMyUser.length === 0){
+        if (findMyUser.length === 0) {
             const dbResult = await User.create(createdUser);
             res.status(200).json(dbResult);
-        
+
         }
 
         res.redirect(process.env.FRONTEND_URL);
-        
+
     } catch (error) {
         console.log(error);
         next(error);
