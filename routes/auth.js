@@ -21,7 +21,6 @@ router.get("/twitch/callback", async function(req, res, next) {
 
         const getUserID = await axios.get(`https://api.twitch.tv/helix/users`, { headers })
             // a ajouter dans notre DB ET dans notre session
-            console.log(">>>>>>>>>>>>>>>>><<", getUserID.data[0]);
             req.session.currentUser = getUserID.data[0];
 
         let { id, email, profile_image_url, display_name, broadcaster_type } = getUserID.data.data[0];
@@ -53,9 +52,6 @@ router.get("/twitch/callback", async function(req, res, next) {
 
 
 router.get("/isLoggedIn", (req, res, next) => {
-
-    console.log("_o/ \o/ \o_", req.session, ":::://<<<<<>>>>>");
-
     if (!req.session.currentUser)
         return res.status(401).json({ message: "Unauthorized" });
 
@@ -67,11 +63,18 @@ router.get("/isLoggedIn", (req, res, next) => {
         .catch(next);
 });     
 
-router.get("/logout", (req, res, next) => {
-    req.session.destroy(function(error) {
+router.get("/logout",  (req, res, next) => {
+    req.session.destroy( async function(error) {
         if (error) next(error);
-        else res.status(200).json({ message: "Succesfully disconnected." });
+        else{
+
+            const apiResult = await axios.post(`https://id.twitch.tv/oauth2/revoke?client_id=${process.env.TWITCH_CLIENT_ID}&token=${req.session.currentUser.twitchToken.access_token}`);    
+
+            res.status(200).json({ message: "Succesfully disconnected." });
+        } 
     });
+
+
 });
 
 module.exports = router;
