@@ -9,16 +9,9 @@ router.get("/twitch/callback", async function(req, res, next) {
 
         //equivaut a req.session.currentuser
         //mettre api result dans session
-<<<<<<< HEAD
         req.session.currentuser.twitchToken = apiResult.data;
         req.session.currentuser.twitchToken.timestamp = Date.now();
         console.log(apiResult.data);
-=======
-        //req.session.currentUser = {};
-        // req.session.currentuser.twitchToken = apiResult.data;
-        //req.session.currentuser.twitchToken.timestamp = Date.now();
-
->>>>>>> 8aa2120b40623d3b6e83683d50603a03ca24450f
 
 
         let headers = {
@@ -28,12 +21,8 @@ router.get("/twitch/callback", async function(req, res, next) {
 
         const getUserID = await axios.get(`https://api.twitch.tv/helix/users`, { headers })
             // a ajouter dans notre DB ET dans notre session
-<<<<<<< HEAD
         req.session.currentUser = getUserID.data.data[0];
         console.log(req.session);
-=======
-            req.session.currentUser = getUserID.data[0];
->>>>>>> 8aa2120b40623d3b6e83683d50603a03ca24450f
 
         let { id, email, profile_image_url, display_name, broadcaster_type } = getUserID.data.data[0];
 
@@ -47,13 +36,8 @@ router.get("/twitch/callback", async function(req, res, next) {
 
         const findMyUser = await User.find({ twitch_id: { $eq: id } });
 
-<<<<<<< HEAD
-        console.log("_o/ \o/ \o_", findMyUser, ":::://<<<<<>>>>>");
+
         if (findMyUser.length === 0) {
-=======
-       
-        if (findMyUser.length === 0){
->>>>>>> 8aa2120b40623d3b6e83683d50603a03ca24450f
             const dbResult = await User.create(createdUser);
             res.status(200).json(dbResult);
 
@@ -78,17 +62,17 @@ router.get("/isLoggedIn", (req, res, next) => {
             res.status(200).json(userDocument);
         })
         .catch(next);
-});     
+});
 
-router.get("/logout",  (req, res, next) => {
-    req.session.destroy( async function(error) {
+router.get("/logout", (req, res, next) => {
+    req.session.destroy(async function(error) {
         if (error) next(error);
-        else{
+        else {
 
-            const apiResult = await axios.post(`https://id.twitch.tv/oauth2/revoke?client_id=${process.env.TWITCH_CLIENT_ID}&token=${req.session.currentUser.twitchToken.access_token}`);    
+            const apiResult = await axios.post(`https://id.twitch.tv/oauth2/revoke?client_id=${process.env.TWITCH_CLIENT_ID}&token=${req.session.currentUser.twitchToken.access_token}`);
 
             res.status(200).json({ message: "Succesfully disconnected." });
-        } 
+        }
     });
 
 
