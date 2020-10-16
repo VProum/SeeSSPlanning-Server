@@ -7,12 +7,12 @@ const scheduleSchema = new Schema({
     enum: ["Monday", "Tuesday", "Wenesday", 
             "Thursday", "Friday", "Saturday", "Sunday"], 
   },
-  hour_day: Date,
+  hour_day: { type:  String,required: true, unique:true },
   duration: Number,
-  avatar: String,
-  streamer_id: [{ type: Schema.Types.ObjectId, ref: "User" }],
+  avatar: Date,
+  streamer_id: [Number ],
   game_info: [String],
-  titre, String,
+  titre: String,
 });
 
 const Schedule = mongoose.model("Schedule", scheduleSchema);

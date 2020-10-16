@@ -57,7 +57,8 @@ app.use("/auth", authRouter);
 
 
 
-
+const scheduleRouter = require("./routes/schedule");
+app.use("/", scheduleRouter);
 
 
 
