@@ -59,7 +59,8 @@ app.use("/", streamerRouter);
 
 
 
-
+const scheduleRouter = require("./routes/schedule");
+app.use("/", scheduleRouter);
 
 
 
