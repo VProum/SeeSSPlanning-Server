@@ -3,6 +3,7 @@ const router = express.Router();
 const Schedule = require("../models/Schedule");
 const axios = require("axios");
 const dayjs = require("dayjs");
+const User = require("../models/User");
 
 router.post("/schedule/create", async (req, res, next) => {
   const newSchedule = req.body;
@@ -16,7 +17,9 @@ router.post("/schedule/create", async (req, res, next) => {
   try {
     let dBRes = await Schedule.create(newObjSchedule);
 
-    console.log(req.session.currentUser.twitch_id);
+    let dbResUsr = await User.findOneAndUpdate({twitch_id: {$eq: req.session.currentUser.id}}, 
+                            {$push : {planningList: dBRes._id}} );
+
 
     res.status(201).json(dBRes);
   } catch (error) {

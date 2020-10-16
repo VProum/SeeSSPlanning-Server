@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const scheduleSchema = new Schema({
   weekday: {
     type: String,
-    enum: ["Monday", "Tuesday", "Wenesday", 
+    enum: ["Monday", "Tuesday", "Wednesday", 
             "Thursday", "Friday", "Saturday", "Sunday"], 
   },
   hour_day: { type:  String,required: true, unique:true },
