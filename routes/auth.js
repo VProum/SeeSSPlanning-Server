@@ -17,7 +17,7 @@ router.get("/twitch/callback", async function(req, res, next) {
         const getUserID = await axios.get(`https://api.twitch.tv/helix/users`, { headers })
             // a ajouter dans notre DB ET dans notre session
         req.session.currentUser = getUserID.data.data[0];
-        console.log(req.session);
+        //console.log(req.session);
 
         //equivaut a req.session.currentuser
         //mettre api result dans session
