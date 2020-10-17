@@ -60,6 +60,7 @@ router.get("/isLoggedIn", (req, res, next) => {
     const id = req.session.currentUser.id;
     User.find({ twitch_id: { $eq: id } })
         .then((userDocument) => {
+            console.log(userDocument)
             res.status(200).json(userDocument);
         })
         .catch(next);
