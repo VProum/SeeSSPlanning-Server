@@ -13,6 +13,18 @@ router.get("/user/streamer", async function(req, res, next) {
     }
 });
 
+
+router.get("/user/streamer/search/:data", async(req, res, next) => {
+    try{
+        const searchStreamer = req.params.data;
+        const dbRes = await User.find({nickname: {$regex: '.*' + searchStreamer + '.*', $options: 'i'}})
+        console.log(dbRes, " << result from search bar");
+        res.status(200).json(dbRes);
+    }catch(err){
+        console.log(err);
+    }
+})
+
 router.get("/user/follow", async function(req, res, next) {
     try {
         //console.log(req.session.currentUser);

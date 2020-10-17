@@ -8,7 +8,6 @@ router.get("/twitch/callback", async function(req, res, next) {
         const apiResult = await axios.post(`https://id.twitch.tv/oauth2/token?client_id=${process.env.TWITCH_CLIENT_ID}&client_secret=${process.env.TWITCH_CLIENT_SECRET}&code=${req.query.code}&grant_type=authorization_code&redirect_uri=http://localhost:8080/auth/twitch/callback`)
 
 
-
         let headers = {
             "Authorization": `Bearer ${apiResult.data.access_token}`,
             "Client-Id": process.env.TWITCH_CLIENT_ID
