@@ -84,8 +84,9 @@ router.delete("/schedule/delete/:id", async (req, res, next) =>{
     const dbResult = await Schedule.findByIdAndDelete({
       _id : req.params.id
     });
-    console.log(dbResult);
-    res.status(200);
+  
+    const dbRes = await Schedule.find( {streamer_id : req.session.currentUser.id});
+    res.status(200).json(dbRes);
   } catch (error) {
     console.log(error);
     next(error);
