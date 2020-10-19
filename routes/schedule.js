@@ -118,4 +118,31 @@ router.delete("/schedule/delete/:id", async (req, res, next) =>{
   }
 });
 
+router.get("/schedule/view/:id", async (req, res, next) => {
+  // try {
+  //   const dbRes = await Schedule.findById(req.params.id);
+  //   res.status(200).json(dbRes)
+  // } catch (error) {
+  //   res.status(500);
+  //   next(error);
+  // }
+  try {
+    const dbRes = await User.find({
+      $and: [
+        {twitch_id:  {$eq: req.session.currentUser.id}},
+        {planningList: {$in: req.params.id}}
+      ],
+    });
+    res.status(200).json(dbRes);
+  } catch (error) {
+    res.status(500);
+    next(error);
+  }
+});
+
+
+
+
+
+
 module.exports = router;
