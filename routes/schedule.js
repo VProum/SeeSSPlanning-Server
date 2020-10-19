@@ -4,9 +4,11 @@ const Schedule = require("../models/Schedule");
 const axios = require("axios");
 const dayjs = require("dayjs");
 const User = require("../models/User");
-const weekday = require('dayjs/plugin/weekday')
+const weekday = require('dayjs/plugin/weekday');
+const uploader = require("../config/cloudinary");
 
-router.post("/schedule/create", async (req, res, next) => {
+
+router.post("/schedule/create", uploader.single("image"), async (req, res, next) => {
   const newSchedule = req.body;
   let newObjSchedule = {};
   let hourDAy = dayjs(req.body.hour_day).format("HH:mm");
@@ -14,12 +16,25 @@ router.post("/schedule/create", async (req, res, next) => {
   newObjSchedule = { ...req.body, hour_day: hourDAy };
   newObjSchedule.streamer_id = [];
   newObjSchedule.streamer_id.push(req.session.currentUser.id);
+  newObjSchedule.streamer_name = [];
+  newObjSchedule.streamer_name.push(req.session.currentUser.display_name);
 
   try {
+
+    let planningImg = "";
+
+
+    if(req.file){
+      planningImg = req.file.path;
+    }
+
     let dBRes = await Schedule.create(newObjSchedule);
 
-    let dbResUsr = await User.findOneAndUpdate({twitch_id: {$eq: req.session.currentUser.id}}, 
-                            {$push : {planningList: dBRes._id}} );
+    let dbResUsr = await User.findOneAndUpdate({
+      twitch_id: {$eq: req.session.currentUser.id}}, 
+      {$push : {planningList: dBRes._id},
+      planning_image : planningImg,
+    });
     res.status(201).json(dBRes);
   } catch (error) {
     console.log(error);
@@ -59,8 +74,6 @@ let startWeek = dayjs(start_of_week(current_millis, 'monday')).$d;
 //console.log(`week ends on monday: ${dayjs(end_of_week(current_millis, 'monday')).$d}`)
 let endWeek = dayjs(end_of_week(current_millis, 'monday')).$d;
 
-console.log(startWeek);
-console.log(endWeek);
 try {
 
   
@@ -71,7 +84,6 @@ try {
       // {hour_day : {$lte: endWeek}},
     ],
   });
-  console.log(dbRes);
   res.status(200).json(dbRes);
 
 } catch (error) {

@@ -12,6 +12,7 @@ const userSchema = new Schema({
     moderator: [{ type: Schema.Types.ObjectId, ref: "User" }],
     socialNetwork: [String],
     planningList: [{ type: Schema.Types.ObjectId, ref: "Schedule" }],
+    planning_image: String,
 });
 
 const User = mongoose.model("User", userSchema);
