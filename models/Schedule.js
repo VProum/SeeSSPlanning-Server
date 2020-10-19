@@ -7,7 +7,7 @@ const scheduleSchema = new Schema({
     enum: ["Monday", "Tuesday", "Wednesday", 
             "Thursday", "Friday", "Saturday", "Sunday"], 
   },
-  hour_day: { type:  String,required: true, unique:true },
+  hour_day: { type:  String},
   duration: Number,
   avatar: Date,
   streamer_id: [Number ],
