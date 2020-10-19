@@ -15,12 +15,12 @@ router.get("/user/streamer", async function(req, res, next) {
 
 
 router.get("/user/streamer/search/:data", async(req, res, next) => {
-    try{
+    try {
         const searchStreamer = req.params.data;
-        const dbRes = await User.find({nickname: {$regex: '.*' + searchStreamer + '.*', $options: 'i'}})
+        const dbRes = await User.find({ nickname: { $regex: '.*' + searchStreamer + '.*', $options: 'i' } })
         console.log(dbRes, " << result from search bar");
         res.status(200).json(dbRes);
-    }catch(err){
+    } catch (err) {
         console.log(err);
     }
 })
@@ -28,7 +28,7 @@ router.get("/user/streamer/search/:data", async(req, res, next) => {
 router.get("/user/follow", async function(req, res, next) {
     try {
         //console.log(req.session.currentUser);
-        const dbResult = await User.find({ twitch_id: { $eq: req.session.currentUser.id } }).populate("streamer_list");
+        const dbResult = await User.find({ twitch_id: { $eq: req.session.currentUser.id } }).populate({ path: 'streamer_list', populate: { path: 'planningList' } }); //.populate("streamer_list").populate("streamer_list.planningList");
         //console.log(dbResult[0].streamer_list);
         res.status(200).json(dbResult[0].streamer_list);
     } catch (error) {
