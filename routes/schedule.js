@@ -19,9 +19,6 @@ router.post("/schedule/create", uploader.single("image"), async (req, res, next)
   newObjSchedule.streamer_name = [];
   newObjSchedule.streamer_name.push(req.session.currentUser.display_name);
   
-
-  console.log(newObjSchedule);
-  console.log(req.session.currentUser);
   try {
 
     let planningImg = "";

@@ -12,7 +12,7 @@ const scheduleSchema = new Schema({
   avatar: String,
   streamer_id: [Number ],
   streamer_name: [String],
-  image: String,
+
   game_info: [String],
   titre: String,
 },

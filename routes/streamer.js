@@ -68,4 +68,11 @@ router.delete("/user/streamer/:id", async function(req, res, next) {
     }
 });
 
+
+
+router.get("/user/planning/:id", async function(req, res, next){
+    console.log(res);
+});
+
+
 module.exports = router;
