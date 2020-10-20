@@ -13,12 +13,15 @@ router.post("/schedule/create", uploader.single("image"), async (req, res, next)
   let newObjSchedule = {};
   let hourDAy = dayjs(req.body.hour_day).format("HH:mm");
 
-  newObjSchedule = { ...req.body, hour_day: hourDAy };
+  newObjSchedule = { ...req.body, hour_day: hourDAy, avatar: req.session.currentUser.profile_image_url};
   newObjSchedule.streamer_id = [];
   newObjSchedule.streamer_id.push(req.session.currentUser.id);
   newObjSchedule.streamer_name = [];
   newObjSchedule.streamer_name.push(req.session.currentUser.display_name);
+  
 
+  console.log(newObjSchedule);
+  console.log(req.session.currentUser);
   try {
 
     let planningImg = "";
@@ -44,7 +47,6 @@ router.post("/schedule/create", uploader.single("image"), async (req, res, next)
 
 
 router.get("/schedule/get", async (req,res, next) => {
-console.log("Dedicace to Vincent: ", req.session.currentUser)
   // Récupère les jours de la semaine actuel
 const current_millis = dayjs().valueOf()
 const add_day = (count, millis) => dayjs(millis).add(count, 'day').valueOf()
@@ -83,16 +85,17 @@ try {
     //  {hour_day : {$gte: startWeek}},
       // {hour_day : {$lte: endWeek}},
     ],
-  }).populate('streamerid');
-
-
-  console.log(dbRes, ">>>>>>>>>>>> popu popu poulate");
-  res.status(200).json(dbRes);
-
+  }).populate('streamerid')
+  .exec( function (err, schedules) {
+      if (err) {
+        next(err);
+      }
+      const cpySchedules = schedules.map(s =>  s.toObject())
+      res.status(200).json(cpySchedules);
+    })
 } catch (error) {
     console.log(error);
 }
-
 })
 
 
@@ -109,8 +112,6 @@ router.delete("/schedule/delete/:id", async (req, res, next) =>{
         {planningList: {$in: req.params.id}}
       ],
     }, { $pull: { planningList: req.params.id } });
-
-    console.log(dbResDelete); 
 
     
     const dbRes = await Schedule.find( {streamer_id : req.session.currentUser.id});

@@ -10,9 +10,12 @@ cloudinary.config({
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  folder: "cssp", // The name of the folder in cloudinary
+  params: {
+    folder: "cssp", // The name of the folder in cloudinary
+  },
   allowedFormats: ["jpg", "png"],
 });
+
 
 const uploadCloud = multer({ storage: storage });
 
