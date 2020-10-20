@@ -18,20 +18,32 @@ router.get("/twitch/callback", async function(req, res, next) {
         req.session.currentUser = getUserID.data.data[0];
         //console.log(req.session);
 
+        //const moderators = await axios.get(`https://api.twitch.tv/helix/moderation/moderators?broadcaster_id=${getUserID.data.data[0].id}`, { headers })
+        //console.log(moderators);
+
+        const follower = await axios.get(`https://api.twitch.tv/helix/users/follows?to_id=${getUserID.data.data[0].id}`, { headers })
+            //console.log(follower);
+
+        let { total } = follower.data;
+
+
         //equivaut a req.session.currentuser
         //mettre api result dans session
         req.session.currentUser.twitchToken = apiResult.data;
         req.session.currentUser.twitchToken.timestamp = Date.now();
         //console.log(apiResult.data);
 
-        let { id, email, profile_image_url, display_name, broadcaster_type } = getUserID.data.data[0];
+        let { id, email, profile_image_url, display_name, broadcaster_type, description } = getUserID.data.data[0];
 
         let createdUser = {
             twitch_id: id,
             email: email,
             avatar: profile_image_url,
             nickname: display_name,
-            isStreamer: broadcaster_type ? true : false
+            isStreamer: broadcaster_type ? true : false,
+            description: description,
+            nb_followers: total,
+            streamer_type: broadcaster_type ? broadcaster_type : "noobie"
         }
 
         const findMyUser = await User.find({ twitch_id: { $eq: id } });
@@ -59,7 +71,7 @@ router.get("/isLoggedIn", (req, res, next) => {
     const id = req.session.currentUser.id;
     User.find({ twitch_id: { $eq: id } })
         .then((userDocument) => {
-        //    console.log(userDocument)
+            //    console.log(userDocument)
             res.status(200).json(userDocument);
         })
         .catch(next);
