@@ -14,6 +14,17 @@ const scheduleSchema = new Schema({
   streamer_name: [String],
   game_info: [String],
   titre: String,
+},
+{
+  toObject: {virtuals:true},
+}
+);
+
+scheduleSchema.virtual("streamerid", {
+  ref: 'User',
+  localField: 'streamer_id',
+  foreignField: 'twitch_id',
+  justOne: true // for many-to-1 relationships
 });
 
 const Schedule = mongoose.model("Schedule", scheduleSchema);

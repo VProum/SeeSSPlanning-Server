@@ -83,7 +83,10 @@ try {
     //  {hour_day : {$gte: startWeek}},
       // {hour_day : {$lte: endWeek}},
     ],
-  });
+  }).populate('streamerid');
+
+
+  console.log(dbRes, ">>>>>>>>>>>> popu popu poulate");
   res.status(200).json(dbRes);
 
 } catch (error) {
