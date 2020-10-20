@@ -44,7 +44,7 @@ router.post("/schedule/create", uploader.single("image"), async (req, res, next)
 
 
 router.get("/schedule/get", async (req,res, next) => {
-
+console.log("Dedicace to Vincent: ", req.session.currentUser)
   // Récupère les jours de la semaine actuel
 const current_millis = dayjs().valueOf()
 const add_day = (count, millis) => dayjs(millis).add(count, 'day').valueOf()
