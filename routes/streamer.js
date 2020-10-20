@@ -71,7 +71,13 @@ router.delete("/user/streamer/:id", async function(req, res, next) {
 
 
 router.get("/user/planning/:id", async function(req, res, next){
-    console.log(res);
+    try{
+        const dbRes = await User.find({twitch_id : {$eq: req.params.id}});
+        res.status(200).json(dbRes);
+    }catch(error){
+        console.log(error);
+        next(error);
+    }
 });
 
 
