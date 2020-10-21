@@ -8,6 +8,7 @@ const scheduleSchema = new Schema({
             "Thursday", "Friday", "Saturday", "Sunday"], 
   },
   hour_day: { type:  String},
+  calcDuration: { type:  String},
   duration: Number,
   avatar: String,
   streamer_id: [Number ],

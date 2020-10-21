@@ -12,8 +12,11 @@ router.post("/schedule/create", uploader.single("image"), async (req, res, next)
   const newSchedule = req.body;
   let newObjSchedule = {};
   let hourDAy = dayjs(req.body.hour_day).format("HH:mm");
-
-  newObjSchedule = { ...req.body, hour_day: hourDAy, avatar: req.session.currentUser.profile_image_url};
+  let calcDuration = dayjs(req.body.hour_day).add(req.body.duration, 'hour').format("HH:mm");
+  
+  newObjSchedule = { ...req.body, hour_day: hourDAy, calcDuration: calcDuration, avatar: req.session.currentUser.profile_image_url};
+  
+  console.log(newObjSchedule);
   newObjSchedule.streamer_id = [];
   newObjSchedule.streamer_id.push(req.session.currentUser.id);
   newObjSchedule.streamer_name = [];
