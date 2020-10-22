@@ -33,11 +33,10 @@ router.get("/twitch/callback", async function(req, res, next) {
         req.session.currentUser.twitchToken.timestamp = Date.now();
         //console.log(apiResult.data);
 
-        let { id, email, profile_image_url, display_name, broadcaster_type, description } = getUserID.data.data[0];
+        let { id, profile_image_url, display_name, broadcaster_type, description } = getUserID.data.data[0];
 
         let createdUser = {
             twitch_id: id,
-            email: email,
             avatar: profile_image_url,
             nickname: display_name,
             isStreamer: total > 10 ? true : false,

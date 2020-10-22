@@ -3,7 +3,6 @@ const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
     nickname: String,
-    email: { type: String },
     avatar: String,
     streamer_list: [{ type: Schema.Types.ObjectId, ref: "User" }],
     twitch_id: { type: String, required: true, unique: true },
