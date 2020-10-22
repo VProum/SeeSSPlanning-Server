@@ -66,11 +66,6 @@ if (process.env.NODE_ENV === "production") {
     });
 }
 
-
-
-
-
-
 // 404 Middleware
 app.use((req, res, next) => {
     const error = new Error("Ressource not found.");
