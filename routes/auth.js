@@ -40,19 +40,20 @@ router.get("/twitch/callback", async function(req, res, next) {
             email: email,
             avatar: profile_image_url,
             nickname: display_name,
-            isStreamer: broadcaster_type ? true : false,
+            isStreamer: total > 10 ? true : false,
             description: description,
             nb_followers: total,
-            streamer_type: broadcaster_type ? broadcaster_type : "noobie"
+            streamer_type: broadcaster_type ? broadcaster_type : "G@m3rz"
         }
 
         const findMyUser = await User.find({ twitch_id: { $eq: id } });
 
 
         if (findMyUser.length === 0) {
-            const dbResult = await User.create(createdUser);
-            res.status(200).json(dbResult);
-
+            await User.create(createdUser);
+            //res.status(200).json(dbResult);
+        } else {
+            await User.findOneAndUpdate({ twitch_id: { $eq: id } }, createdUser);
         }
 
         res.redirect(process.env.FRONTEND_URL);
@@ -84,10 +85,12 @@ router.get("/logout", async(req, res, next) => {
         req.session.destroy(function(error) {
             if (error) next(error);
             else {
-                res.status(200).json({ message: "Succesfully disconnected." });
+
+                //res.status(200).json({ message: "Succesfully disconnected." });
             }
         });
     }
+    res.redirect(process.env.FRONTEND_URL);
 });
 
 module.exports = router;
