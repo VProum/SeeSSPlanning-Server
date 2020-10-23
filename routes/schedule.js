@@ -13,8 +13,20 @@ router.post("/schedule/create", uploader.single("image"), async (req, res, next)
   let newObjSchedule = {};
   let hourDAy = dayjs(req.body.hour_day).format("HH:mm");
   let calcDuration = dayjs(req.body.hour_day).add(req.body.duration, 'hour').format("HH:mm");
+  let hour = dayjs(req.body.hour_day).format("HH:mm");
+ 
+  let dayPeriod ="";
+  if(hour >= "00" && hour <= "12"){
+    dayPeriod = "morning";
+  } else if(hour > "12" && hour <= "18") {
+    dayPeriod = "afternoon";
+  } else if(hour > "18" && hour < "24") {
+    dayPeriod = "night";
+  } else {
+    console.log(hour);
+  }
   
-  newObjSchedule = { ...req.body, hour_day: hourDAy, calcDuration: calcDuration, avatar: req.session.currentUser.profile_image_url};
+  newObjSchedule = { ...req.body, hour_day: hourDAy, calcDuration: calcDuration, avatar: req.session.currentUser.profile_image_url, dayPeriod: dayPeriod };
   
   console.log(newObjSchedule);
   newObjSchedule.streamer_id = [];
@@ -77,7 +89,6 @@ let startWeek = dayjs(start_of_week(current_millis, 'monday')).$d;
 let endWeek = dayjs(end_of_week(current_millis, 'monday')).$d;
 
 try {
-
   
   let dbRes = await Schedule.find({
     $and: [
