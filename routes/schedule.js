@@ -23,12 +23,12 @@ router.post("/schedule/create", uploader.single("image"), async (req, res, next)
   } else if(hour > "18" && hour < "24") {
     dayPeriod = "night";
   } else {
-    console.log(hour);
+    // console.log(hour);
   }
   
   newObjSchedule = { ...req.body, hour_day: hourDAy, calcDuration: calcDuration, avatar: req.session.currentUser.profile_image_url, dayPeriod: dayPeriod };
   
-  console.log(newObjSchedule);
+  // console.log(newObjSchedule);
   newObjSchedule.streamer_id = [];
   newObjSchedule.streamer_id.push(req.session.currentUser.id);
   newObjSchedule.streamer_name = [];
